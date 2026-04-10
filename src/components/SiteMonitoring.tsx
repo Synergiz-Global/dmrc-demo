@@ -1,0 +1,208 @@
+import React from 'react';
+import { Video, View, MapPin, AlertCircle, CheckCircle, ArrowRightLeft, Camera } from 'lucide-react';
+import { motion } from 'motion/react';
+import { cn } from '../lib/utils';
+import { BarChart, Bar, ResponsiveContainer, Cell } from 'recharts';
+
+const POUR_DATA = [
+  { value: 60 }, { value: 80 }, { value: 95 }, { value: 75 }, { value: 85 }
+];
+
+export default function SiteMonitoring() {
+  return (
+    <div className="space-y-8">
+      {/* Title Section */}
+      <section className="px-6 pt-6">
+        <span className="text-secondary font-bold tracking-[0.2em] text-[10px] uppercase block mb-1">Reality Capture</span>
+        <h2 className="text-3xl font-black tracking-tight">Site Monitoring</h2>
+      </section>
+
+      {/* Project Context */}
+      <section className="px-6 py-3 bg-surface-container-low flex items-center gap-2 border-y border-surface-container">
+        <MapPin className="w-4 h-4 text-primary fill-primary/20" />
+        <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Delhi Metro Phase IV | Janakpuri West Station</span>
+      </section>
+
+      {/* Live View Section */}
+      <section className="px-4">
+        <div className="relative aspect-video rounded-3xl overflow-hidden bg-on-background shadow-xl group">
+          <img 
+            src="https://picsum.photos/seed/metro/800/450" 
+            alt="Live Feed" 
+            className="w-full h-full object-cover opacity-80"
+          />
+          
+          {/* Overlays */}
+          <div className="absolute top-1/4 left-1/3 w-20 h-32 border-2 border-primary rounded-xl bg-primary/10 backdrop-blur-[2px] p-2">
+            <span className="bg-primary text-[8px] text-white px-2 py-0.5 font-bold rounded-lg uppercase tracking-widest">PPE OK</span>
+          </div>
+          
+          <div className="absolute top-1/2 left-2/3 w-16 h-24 border-2 border-secondary rounded-xl bg-secondary/10 backdrop-blur-[2px] p-2">
+            <span className="bg-secondary text-[8px] text-white px-2 py-0.5 font-bold rounded-lg uppercase tracking-widest">NO HELMET</span>
+          </div>
+
+          <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+            <span className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
+            <span className="text-[10px] font-black text-white tracking-[0.15em] uppercase">Live CCTV Feed</span>
+          </div>
+
+          {/* View Toggle */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex bg-black/60 backdrop-blur-xl p-1.5 rounded-2xl border border-white/10 shadow-2xl">
+            <button className="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-primary shadow-lg flex items-center gap-2 transition-all active:scale-95">
+              <Video className="w-4 h-4" /> Reality
+            </button>
+            <button className="px-6 py-2.5 rounded-xl text-xs font-bold text-white/60 hover:text-white transition-colors flex items-center gap-2 active:scale-95">
+              <View className="w-4 h-4" /> BIM Model
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Camera Carousel */}
+      <section className="px-6">
+        <h3 className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-4">Available Viewpoints</h3>
+        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+          <CameraThumb label="CAM-01 (Gate 3)" active seed="cam1" />
+          <CameraThumb label="CAM-04 (Track A)" seed="cam2" />
+          <CameraThumb label="CAM-07 (Utility)" seed="cam3" />
+        </div>
+      </section>
+
+      {/* Stats Grid */}
+      <section className="px-6 grid grid-cols-12 gap-4">
+        {/* Safety Status */}
+        <div className="col-span-5 bg-white rounded-[2rem] p-6 flex flex-col items-center justify-center text-center shadow-sm border border-surface-container">
+          <h3 className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-6">Safety Status</h3>
+          <div className="relative w-24 h-24 flex items-center justify-center">
+            <svg className="w-full h-full transform -rotate-90">
+              <circle className="text-surface-container" cx="48" cy="48" r="42" fill="transparent" stroke="currentColor" strokeWidth="8" />
+              <circle className="text-primary" cx="48" cy="48" r="42" fill="transparent" stroke="currentColor" strokeWidth="8" strokeDasharray="264" strokeDashoffset="5.28" strokeLinecap="round" />
+            </svg>
+            <div className="absolute flex flex-col items-center">
+              <span className="text-2xl font-black text-on-surface">98%</span>
+            </div>
+          </div>
+          <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mt-4">Compliance</span>
+        </div>
+
+        {/* Alerts */}
+        <div className="col-span-7 space-y-4">
+          <h3 className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Recent Site Alerts</h3>
+          <AlertItem icon={<AlertCircle className="w-4 h-4" />} title="PPE Violation at Gate 3" time="2 mins ago" type="error" />
+          <AlertItem icon={<CheckCircle className="w-4 h-4" />} title="Area 4 Structural Scan" time="15 mins ago" type="info" />
+        </div>
+      </section>
+
+      {/* BIM Comparison */}
+      <section className="px-6">
+        <h3 className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-4">BIM Comparison & Deviations</h3>
+        <div className="space-y-4">
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-surface-container">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Structural Precision</h4>
+              <span className="text-sm font-black text-primary">98.2%</span>
+            </div>
+            <div className="w-full bg-surface-container rounded-full h-2.5 mb-2">
+              <div className="bg-primary h-full rounded-full" style={{ width: '98.2%' }} />
+            </div>
+            <p className="text-[10px] text-on-surface-variant font-medium">Alignment accuracy vs Architectural Model</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-surface-container border-l-4 border-l-warning">
+              <h4 className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-2">Volume Variance</h4>
+              <div className="text-2xl font-black text-warning">+2.4%</div>
+              <p className="text-[10px] font-bold text-on-surface mt-1">Excavation Surplus</p>
+            </div>
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-surface-container border-l-4 border-l-compliance">
+              <h4 className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-2">Schedule Health</h4>
+              <div className="text-sm font-black text-compliance flex items-center gap-1">
+                <CheckCircle className="w-4 h-4" /> On Track
+              </div>
+              <p className="text-[10px] font-bold text-on-surface mt-1">0.5 day lead</p>
+            </div>
+          </div>
+
+          {/* Photo vs Digital Twin */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-surface-container">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Photo vs Digital Twin</h4>
+              <span className="text-[10px] font-black text-secondary uppercase bg-secondary/10 px-3 py-1 rounded-lg">1 Deviation Detected</span>
+            </div>
+            <div className="flex items-center gap-6 py-4 border-y border-surface-container mb-4">
+              <div className="flex-1 flex flex-col items-center gap-2">
+                <Camera className="w-8 h-8 text-primary" />
+                <span className="text-[8px] font-black uppercase tracking-widest">Reality</span>
+              </div>
+              <ArrowRightLeft className="w-6 h-6 text-on-surface-variant opacity-30" />
+              <div className="flex-1 flex flex-col items-center gap-2">
+                <View className="w-8 h-8 text-primary" />
+                <span className="text-[8px] font-black uppercase tracking-widest">BIM Model</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 bg-secondary/5 p-4 rounded-2xl border border-secondary/10">
+              <AlertCircle className="w-5 h-5 text-secondary" />
+              <div>
+                <p className="text-xs font-black text-on-surface">Column P-42 Offset: 12mm</p>
+                <p className="text-[10px] text-on-surface-variant font-medium">East Axis deviation exceeds tolerance</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Site Intelligence */}
+      <section className="px-6">
+        <h3 className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-4">Site Intelligence</h3>
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-surface-container">
+          <h4 className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-6">Concrete Pour Accuracy</h4>
+          <div className="h-16 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={POUR_DATA}>
+                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                  {POUR_DATA.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 2 ? '#003f77' : '#003f7733'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest mt-4">Current Batch Avg. 94.8%</p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function CameraThumb({ label, active, seed }: { label: string; active?: boolean; seed: string }) {
+  return (
+    <div className={cn(
+      "flex-shrink-0 w-32 aspect-[4/3] rounded-2xl overflow-hidden relative transition-all",
+      active ? "ring-4 ring-primary ring-offset-2 scale-105" : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0"
+    )}>
+      <img src={`https://picsum.photos/seed/${seed}/200/150`} className="w-full h-full object-cover" alt={label} />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      <span className="absolute bottom-3 left-3 text-[8px] text-white font-black uppercase tracking-widest">{label}</span>
+    </div>
+  );
+}
+
+function AlertItem({ icon, title, time, type }: { icon: React.ReactNode; title: string; time: string; type: 'error' | 'info' }) {
+  return (
+    <div className={cn(
+      "bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border",
+      type === 'error' ? "border-secondary/10" : "border-primary/10"
+    )}>
+      <div className={cn(
+        "w-10 h-10 rounded-full flex items-center justify-center",
+        type === 'error' ? "bg-secondary text-white" : "bg-primary text-white"
+      )}>
+        {icon}
+      </div>
+      <div className="flex flex-col">
+        <span className="text-xs font-black text-on-surface">{title}</span>
+        <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">{time}</span>
+      </div>
+    </div>
+  );
+}
