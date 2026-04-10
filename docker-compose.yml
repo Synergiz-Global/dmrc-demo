@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build: .
+    container_name: vite-react-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - DISABLE_HMR=false
+    restart: unless-stopped
