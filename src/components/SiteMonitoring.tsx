@@ -1,5 +1,5 @@
-import React from 'react';
-import { Video, View, MapPin, AlertCircle, CheckCircle, ArrowRightLeft, Camera, ScanEye, HardHat, FileSignature, Network } from 'lucide-react';
+import React, { useState } from 'react';
+import { Video, View, MapPin, AlertCircle, CheckCircle, ArrowRightLeft, Camera, ScanEye, HardHat, FileSignature, Network, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { BarChart, Bar, ResponsiveContainer, Cell } from 'recharts';
 
@@ -8,6 +8,11 @@ const POUR_DATA = [
 ];
 
 export default function SiteMonitoring() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Read from env variable (supports Create React App, Next.js, and Vite formats)
+  const streamUrl = process.env.REACT_APP_YOUTUBE_STREAM_URL || process.env.NEXT_PUBLIC_YOUTUBE_STREAM_URL || (import.meta.env && import.meta.env.VITE_YOUTUBE_STREAM_URL);
+
   return (
     <div className="space-y-8 pb-20 font-sans">
       {/* Title Section */}
@@ -32,7 +37,10 @@ export default function SiteMonitoring() {
 
       {/* Live View Section */}
       <section className="px-4">
-        <div className="relative aspect-video rounded-3xl overflow-hidden bg-on-background shadow-xl group">
+        <div 
+          onClick={() => setIsModalOpen(true)}
+          className="relative aspect-video rounded-3xl overflow-hidden bg-on-background shadow-xl group cursor-pointer transition-transform hover:scale-[1.01]"
+        >
           <img 
             src="https://picsum.photos/seed/metro/800/450" 
             alt="Live Feed" 
@@ -40,29 +48,36 @@ export default function SiteMonitoring() {
           />
           
           {/* AI Vision Overlays */}
-          <div className="absolute top-1/4 left-1/3 w-20 h-32 border-2 border-primary rounded-xl bg-primary/10 backdrop-blur-[2px] p-2 flex flex-col justify-between">
+          <div className="absolute top-1/4 left-1/3 w-20 h-32 border-2 border-primary rounded-xl bg-primary/10 backdrop-blur-[2px] p-2 flex flex-col justify-between pointer-events-none">
             <span className="bg-primary text-[8px] text-white px-2 py-0.5 font-bold rounded-lg uppercase tracking-widest w-fit">PPE OK</span>
             <span className="text-[8px] text-white font-black bg-black/50 px-1 rounded">ID: W-402</span>
           </div>
           
-          <div className="absolute top-1/2 left-2/3 w-16 h-24 border-2 border-secondary rounded-xl bg-secondary/10 backdrop-blur-[2px] p-2 flex flex-col justify-between shadow-[0_0_15px_rgba(var(--secondary-rgb),0.5)]">
+          <div className="absolute top-1/2 left-2/3 w-16 h-24 border-2 border-secondary rounded-xl bg-secondary/10 backdrop-blur-[2px] p-2 flex flex-col justify-between shadow-[0_0_15px_rgba(var(--secondary-rgb),0.5)] pointer-events-none">
             <span className="bg-secondary text-[8px] text-white px-2 py-0.5 font-bold rounded-lg uppercase tracking-widest w-fit animate-pulse">NO HELMET</span>
             <span className="text-[8px] text-white font-black bg-secondary/80 px-1 rounded w-fit">Drafting RFI...</span>
           </div>
 
-          <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+          <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 pointer-events-none">
             <span className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
             <span className="text-[10px] font-black text-white tracking-[0.15em] uppercase">Live CCTV: Feed 04</span>
           </div>
 
           {/* View Toggle */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex bg-black/60 backdrop-blur-xl p-1.5 rounded-2xl border border-white/10 shadow-2xl">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex bg-black/60 backdrop-blur-xl p-1.5 rounded-2xl border border-white/10 shadow-2xl pointer-events-none">
             <button className="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-primary shadow-lg flex items-center gap-2 transition-all active:scale-95">
               <Video className="w-4 h-4" /> Reality
             </button>
             <button className="px-6 py-2.5 rounded-xl text-xs font-bold text-white/60 hover:text-white transition-colors flex items-center gap-2 active:scale-95">
               <View className="w-4 h-4" /> BIM Overlay
             </button>
+          </div>
+          
+          {/* Click to play indicator */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+             <div className="bg-black/80 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 text-white font-bold tracking-widest uppercase text-xs flex items-center gap-2">
+                <Video className="w-4 h-4" /> Open Live Stream
+             </div>
           </div>
         </div>
       </section>
@@ -191,6 +206,37 @@ export default function SiteMonitoring() {
           <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest mt-4">Current Batch Consistency: 94.8%</p>
         </div>
       </section>
+
+      {/* YouTube Live Stream Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 md:p-12">
+          <div className="relative w-full max-w-6xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center">
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 z-10 bg-black/50 text-white p-3 rounded-full hover:bg-black/80 hover:scale-110 transition-all border border-white/20"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {streamUrl ? (
+              <iframe 
+                src={`${streamUrl}?autoplay=1&mute=1`}
+                title="YouTube Live Stream"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              />
+            ) : (
+              <div className="flex flex-col items-center gap-4 text-white/50">
+                <Video className="w-16 h-16 opacity-50" />
+                <p className="font-bold tracking-widest uppercase text-sm">Stream not available</p>
+                <p className="text-xs opacity-50">Please configure the stream URL environment variable.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
