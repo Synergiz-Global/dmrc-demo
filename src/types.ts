@@ -1,4 +1,4 @@
-export type Screen = 'home' | 'rfi' | 'escalations' | 'chat' | 'more';
+export type Screen = 'home' | 'rfi' | 'escalations' | 'chat' | 'monitoring';
 
 export interface RFI {
   id: string;

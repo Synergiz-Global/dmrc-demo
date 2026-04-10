@@ -25,8 +25,8 @@ export default function App() {
         return <EscalationHub />;
       case 'chat':
         return <AIChat />;
-      case 'more':
-        return <SiteMonitoring />; // Using Site Monitoring as the "More" or default detailed view
+      case 'monitoring':
+        return <SiteMonitoring />;
       default:
         return <FieldHome />;
     }
