@@ -19,8 +19,7 @@ export default defineConfig(({ mode }) => {
       hmr: process.env.DISABLE_HMR !== 'true',
 
       allowedHosts: [
-        'syntrackpro.com',
-        'www.syntrackpro.com'
+        'sg-dmrc-demo.netlify.app'
       ],
     },
   };
